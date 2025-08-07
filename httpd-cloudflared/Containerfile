@@ -1,0 +1,17 @@
+# Use the official Apache httpd image as the base
+FROM httpd:2.4
+
+# Install curl, download and install cloudflared, then clean up
+RUN apt-get update && apt-get install -y curl && \
+    curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb && \
+    dpkg -i cloudflared.deb && \
+    apt-get clean && rm cloudflared.deb
+
+# Copy the entrypoint script into the container
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+
+# Make the script executable
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Set the entrypoint to our custom script
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
